@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Leads Automation - Web Deployment</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .feature-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 3rem;
+            height: 3rem;
+            font-size: 1.5rem;
+            border-radius: 0.5rem;
+        }
+        .hero-section {
+            background-color: #0d6efd;
+            color: white;
+            padding: 5rem 0;
+        }
+        .card {
+            transition: transform 0.2s;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-shield-alt me-2"></i>Security Leads Automation
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#deployment">Deployment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#documentation">Documentation</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4">Security Leads Automation System</h1>
+                    <p class="lead mb-4">Generate legitimate leads for security service companies in the USA. Find opportunities for armed and unarmed security guards for events, construction sites, and other security services.</p>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                        <a href="#deployment" class="btn btn-light btn-lg px-4 me-md-2">Deploy Now</a>
+                        <a href="#features" class="btn btn-outline-light btn-lg px-4">Learn More</a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <img src="https://via.placeholder.com/600x400?text=Security+Leads+Dashboard" alt="Dashboard Preview" class="img-fluid rounded shadow">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5" id="features">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Key Features</h2>
+                <p class="lead text-muted">A comprehensive system for generating and managing security service leads</p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="feature-icon bg-primary bg-gradient text-white rounded-3 mb-3">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h5 class="card-title">Multi-source Scraping</h5>
+                            <p class="card-text">Extract data from job boards, government contract sites, and specialized security platforms.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="feature-icon bg-primary bg-gradient text-white rounded-3 mb-3">
+                                <i class="fas fa-filter"></i>
+                            </div>
+                            <h5 class="card-title">Data Validation</h5>
+                            <p class="card-text">Ensure leads are legitimate and relevant with confidence scoring and deduplication.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="feature-icon bg-primary bg-gradient text-white rounded-3 mb-3">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <h5 class="card-title">Automated Scheduling</h5>
+                            <p class="card-text">Run on customizable schedules (daily, weekly, monthly) for continuous lead generation.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="feature-icon bg-primary bg-gradient text-white rounded-3 mb-3">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h5 class="card-title">Interactive Dashboard</h5>
+                            <p class="card-text">Monitor lead generation metrics and system performance through an intuitive dashboard.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="feature-icon bg-primary bg-gradient text-white rounded-3 mb-3">
+                                <i class="fas fa-database"></i>
+                            </div>
+                            <h5 class="card-title">Lead Management</h5>
+                            <p class="card-text">Store, filter, and manage leads with a comprehensive database system.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="feature-icon bg-primary bg-gradient text-white rounded-3 mb-3">
+                                <i class="fas fa-file-export"></i>
+                            </div>
+                            <h5 class="card-title">Export Capabilities</h5>
+                            <p class="card-text">Export leads in JSON or CSV formats for integration with your CRM or sales tools.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5 bg-light" id="deployment">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Deployment Options</h2>
+                <p class="lead text-muted">Multiple ways to deploy the Security Leads Automation system</p>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Development Deployment</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">Quick deployment for testing and development purposes.</p>
+                            <div class="bg-light p-3 rounded mb-3">
+                                <code>./deploy.sh</code>
+                            </div>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Runs on port 8080</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Mounts data and logs directories</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Easy to set up and test</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Production Deployment</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">Permanent deployment for production environments.</p>
+                            <div class="bg-light p-3 rounded mb-3">
+                                <code>./deploy-production.sh</code>
+                            </div>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Runs on standard HTTP port 80</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Includes validation testing</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Optimized for production use</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Cloud Deployment</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">Deploy to cloud platforms for scalability and reliability.</p>
+                            <div class="bg-light p-3 rounded mb-3">
+                                <code>See deployment guide for details</code>
+                            </div>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Supports Heroku, AWS, Google Cloud</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Detailed instructions provided</li>
+                                <li><i class="fas fa-check-circle text-success me-2"></i>Scalable and highly available</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-5" id="documentation">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold">Documentation</h2>
+                <p class="lead text-muted">Comprehensive guides for deployment and usage</p>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Web Deployment Guide</h5>
+                            <p class="card-text">Detailed instructions for deploying the web application permanently.</p>
+                            <ul>
+                                <li>Docker deployment instructions</li>
+                                <li>Cloud platform deployment options</li>
+                                <li>Traditional server setup with Nginx/Apache</li>
+                                <li>Security considerations and best practices</li>
+                                <li>Troubleshooting and maintenance</li>
+                            </ul>
+                            <a href="#" class="btn btn-primary">View Guide</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">User Manual</h5>
+                            <p class="card-text">Complete guide to using the Security Leads Automation system.</p>
+                            <ul>
+                                <li>Dashboard overview and navigation</li>
+                                <li>Managing and filtering leads</li>
+                                <li>Configuring data sources</li>
+                                <li>Setting up automation schedules</li>
+                                <li>Exporting and integrating with other systems</li>
+                            </ul>
+                            <a href="#" class="btn btn-primary">View Manual</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-shield-alt me-2"></i>Security Leads Automation</h5>
+                    <p>Generate legitimate leads for security service companies in the USA.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p>&copy; 2025 Security Leads Automation</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

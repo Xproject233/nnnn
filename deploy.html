@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Deploy Security Leads Automation{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-primary text-white text-center py-4">
+                    <h2 class="mb-0">One-Click Deployment</h2>
+                </div>
+                <div class="card-body p-5">
+                    {% if code %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> You are using invitation code: <strong>{{ code }}</strong>
+                    </div>
+                    {% endif %}
+                    
+                    <p class="lead mb-4">Deploy the Security Leads Automation system with a single click using your invitation code.</p>
+                    
+                    <form method="POST" action="{{ url_for('deploy') }}">
+                        <div class="mb-4">
+                            <label for="code" class="form-label">Invitation Code</label>
+                            <input type="text" class="form-control form-control-lg" id="code" name="code" 
+                                   value="{{ code }}" {% if not code %}autofocus{% endif %} required>
+                            <div class="form-text">Enter the invitation code you received via email</div>
+                        </div>
+                        
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I understand that this will deploy the Security Leads Automation system
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-rocket me-2"></i> Deploy Now
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <p>Don't have an invitation code? <a href="{{ url_for('request_invitation') }}">Request one here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    ports:
+      - "80:8080"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - FLASK_APP=web_app.py
+      - FLASK_ENV=production
+      - DATABASE_PATH=/app/data/leads.db
+    restart: always

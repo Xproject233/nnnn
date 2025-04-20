@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1>System Settings</h1>
+        <p class="lead">Configure the Security Leads Automation System settings.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Scheduler Settings</h5>
+            </div>
+            <div class="card-body">
+                <form id="scheduler-settings-form">
+                    <h6 class="mb-3">Daily Schedule</h6>
+                    <div class="mb-3">
+                        <label for="daily-time" class="form-label">Run Time</label>
+                        <input type="time" class="form-control" id="daily-time" value="08:00">
+                        <div class="form-text">Time to run the automation daily (24-hour format)</div>
+                    </div>
+                    
+                    <h6 class="mb-3 mt-4">Weekly Schedule</h6>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="weekly-monday">
+                            <label class="form-check-label" for="weekly-monday">Monday</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="weekly-tuesday">
+                            <label class="form-check-label" for="weekly-tuesday">Tuesday</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="weekly-wednesday">
+                            <label class="form-check-label" for="weekly-wednesday">Wednesday</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="weekly-thursday">
+                            <label class="form-check-label" for="weekly-thursday">Thursday</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="weekly-friday">
+                            <label class="form-check-label" for="weekly-friday">Friday</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="weekly-saturday">
+                            <label class="form-check-label" for="weekly-saturday">Saturday</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="weekly-sunday">
+                            <label class="form-check-label" for="weekly-sunday">Sunday</label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="weekly-time" class="form-label">Weekly Run Time</label>
+                        <input type="time" class="form-control" id="weekly-time" value="08:00">
+                    </div>
+                    
+                    <h6 class="mb-3 mt-4">Monthly Schedule</h6>
+                    <div class="mb-3">
+                        <label for="monthly-days" class="form-label">Days of Month</label>
+                        <input type="text" class="form-control" id="monthly-days" value="1,15">
+                        <div class="form-text">Comma-separated list of days (1-31)</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="monthly-time" class="form-label">Monthly Run Time</label>
+                        <input type="time" class="form-control" id="monthly-time" value="08:00">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Save Scheduler Settings</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Database Settings</h5>
+            </div>
+            <div class="card-body">
+                <form id="database-settings-form">
+                    <div class="mb-3">
+                        <label for="db-type" class="form-label">Database Type</label>
+                        <select class="form-select" id="db-type">
+                            <option value="sqlite">SQLite</option>
+                            <option value="postgresql">PostgreSQL</option>
+                        </select>
+                    </div>
+                    
+                    <div id="sqlite-settings">
+                        <div class="mb-3">
+                            <label for="sqlite-path" class="form-label">Database Path</label>
+                            <input type="text" class="form-control" id="sqlite-path" value="/home/ubuntu/security_leads_automation/data/leads.db">
+                        </div>
+                    </div>
+                    
+                    <div id="postgresql-settings" style="display: none;">
+                        <div class="mb-3">
+                            <label for="pg-host" class="form-label">Host</label>
+                            <input type="text" class="form-control" id="pg-host" value="localhost">
+                        </div>
+                        <div class="mb-3">
+                            <label for="pg-port" class="form-label">Port</label>
+                            <input type="number" class="form-control" id="pg-port" value="5432">
+                        </div>
+                        <div class="mb-3">
+                            <label for="pg-database" class="form-label">Database Name</label>
+                            <input type="text" class="form-control" id="pg-database" value="security_leads">
+                        </div>
+                        <div class="mb-3">
+                            <label for="pg-user" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="pg-user" value="postgres">
+                        </div>
+                        <div class="mb-3">
+                            <label for="pg-password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="pg-password">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Save Database Settings</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Validation Settings</h5>
+            </div>
+            <div class="card-body">
+                <form id="validation-settings-form">
+                    <div class="mb-3">
+                        <label for="min-confidence" class="form-label">Minimum Confidence Score</label>
+                        <input type="range" class="form-range" min="0" max="1" step="0.1" id="min-confidence" value="0.3">
+                        <div class="d-flex justify-content-between">
+                            <span>0%</span>
+                            <span id="confidence-value">30%</span>
+                            <span>100%</span>
+                        </div>
+                        <div class="form-text">Leads with confidence scores below this threshold will be filtered out</div>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="deduplication-enabled" checked>
+                        <label class="form-check-label" for="deduplication-enabled">Enable Deduplication</label>
+                        <div class="form-text">Automatically detect and remove duplicate leads</div>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="enrichment-enabled" checked>
+                        <label class="form-check-label" for="enrichment-enabled">Enable Data Enrichment</label>
+                        <div class="form-text">Automatically enhance lead data with additional information</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Save Validation Settings</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize form values from config
+        const config = {{ config|tojson }};
+        
+        // Scheduler settings
+        if (config.scheduler && config.scheduler.schedule) {
+            const schedule = config.scheduler.schedule;
+            
+            // Daily schedule
+            if (schedule.daily && schedule.daily.length > 0) {
+                document.getElementById('daily-time').value = schedule.daily[0];
+            }
+            
+            // Weekly schedule
+            if (schedule.weekly) {
+                if (schedule.weekly.days) {
+                    schedule.weekly.days.forEach(day => {
+                        const dayElement = document.getElementById(`weekly-${day.toLowerCase()}`);
+                        if (dayElement) {
+                            dayElement.checked = true;
+                        }
+                    });
+                }
+                if (schedule.weekly.time) {
+                    document.getElementById('weekly-time').value = schedule.weekly.time;
+                }
+            }
+            
+            // Monthly schedule
+            if (schedule.monthly) {
+                if (schedule.monthly.days) {
+                    document.getElementById('monthly-days').value = schedule.monthly.days.join(',');
+                }
+                if (schedule.monthly.time) {
+                    document.getElementById('monthly-time').value = schedule.monthly.time;
+                }
+            }
+        }
+        
+        // Database settings
+        if (config.database) {
+            document.getElementById('db-type').value = config.database.type || 'sqlite';
+            
+            if (config.database.type === 'sqlite') {
+                document.getElementById('sqlite-path').value = config.database.path || '';
+            } else if (config.database.type === 'postgresql') {
+                document.getElementById('pg-host').value = config.database.host || 'localhost';
+                document.getElementById('pg-port').value = config.database.port || 5432;
+                document.getElementById('pg-database').value = config.database.database || 'security_leads';
+                document.getElementById('pg-user').value = config.database.user || 'postgres';
+                // Don't set password for security reasons
+                
+                // Show PostgreSQL settings
+                document.getElementById('sqlite-settings').style.display = 'none';
+                document.getElementById('postgresql-settings').style.display = 'block';
+            }
+        }
+        
+        // Validation settings
+        if (config.validation) {
+            if (config.validation.min_confidence_score !== undefined) {
+                document.getElementById('min-confidence').value = config.validation.min_confidence_score;
+                document.getElementById('confidence-value').textContent = Math.round(config.validation.min_confidence_score * 100) + '%';
+            }
+            
+            if (config.validation.deduplication_enabled !== undefined) {
+                document.getElementById('deduplication-enabled').checked = config.validation.deduplication_enabled;
+            }
+            
+            if (config.validation.enrichment_enabled !== undefined) {
+                document.getElementById('enrichment-enabled').checked = config.validation.enrichment_enabled;
+            }
+        }
+        
+        // Toggle database settings based on type
+        document.getElementById('db-type').addEventListener('change', function() {
+            if (this.value === 'sqlite') {
+                document.getElementById('sqlite-settings').style.display = 'block';
+                document.getElementById('postgresql-settings').style.display = 'none';
+            } else if (this.value === 'postgresql') {
+                document.getElementById('sqlite-settings').style.display = 'none';
+                document.getElementById('postgresql-settings').style.display = 'block';
+            }
+        });
+        
+        // Update confidence score display
+        document.getElementById('min-confidence').addEventListener('input', function() {
+            document.getElementById('confidence-value').textContent = Math.round(this.value * 100) + '%';
+        });
+        
+        // Save scheduler settings
+        document.getElementById('scheduler-settings-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Collect daily schedule
+            const dailyTime = document.getElementById('daily-time').value;
+            
+            // Collect weekly schedule
+            const weeklyDays = [];
+            ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].forEach(day => {
+                if (document.getElementById(`weekly-${day}`).checked) {
+                    weeklyDays.push(day);
+                }
+            });
+            const weeklyTime = document.getElementById('weekly-time').value;
+            
+            // Collect monthly schedule
+            const monthlyDaysStr = document.getElementById('monthly-days').value;
+            const monthlyDays = monthlyDaysStr.split(',').map(day => parseInt(day.trim())).filter(day => !isNaN(day));
+            const monthlyTime = document.getElementById('monthly-time').value;
+            
+            // Build schedule object
+            const schedule = {
+                daily: [dailyTime],
+                weekly: {
+                    days: weeklyDays,
+                    time: weeklyTime
+                },
+                monthly: {
+                    days: monthlyDays,
+                    time: monthlyTime
+                }
+            };
+            
+            // Send to server
+            fetch('/api/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    scheduler: {
+                        schedule: schedule
+                    }
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Scheduler settings saved successfully.');
+                } else {
+                    alert('Error saving scheduler settings.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error saving scheduler settings.');
+            });
+        });
+        
+        // Save database settings
+        document.getElementById('database-settings-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const dbType = document.getElementById('db-type').value;
+            let dbSettings = {};
+            
+            if (dbType === 'sqlite') {
+                dbSettings = {
+                    type: 'sqlite',
+                    path: docume
+(Content truncated due to size limit. Use line ranges to read in chunks)

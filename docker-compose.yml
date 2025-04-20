@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - FLASK_APP=web_app.py
+      - FLASK_ENV=production
+      - DATABASE_PATH=/app/data/leads.db
+    restart: always
+
+  # Uncomment this section if you want to use PostgreSQL instead of SQLite
+  # db:
+  #   image: postgres:14
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   environment:
+  #     - POSTGRES_PASSWORD=securepassword
+  #     - POSTGRES_USER=security_leads
+  #     - POSTGRES_DB=security_leads
+  #   restart: always
+
+# volumes:
+#   postgres_data:

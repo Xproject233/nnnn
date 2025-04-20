@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+
+{% block title %}Security Leads{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Filter Leads</h5>
+                </div>
+                <div class="card-body">
+                    <form id="filter-form" method="GET" action="{{ url_for('leads') }}">
+                        <div class="mb-3">
+                            <label for="state" class="form-label">State</label>
+                            <select class="form-select" id="state" name="state">
+                                <option value="">All States</option>
+                                {% for state in states %}
+                                <option value="{{ state.state_code }}" {% if request.args.get('state') == state.state_code %}selected{% endif %}>
+                                    {{ state.state_name }} ({{ state.lead_count|default(0) }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="source" class="form-label">Source</label>
+                            <select class="form-select" id="source" name="source">
+                                <option value="">All Sources</option>
+                                {% for source in sources %}
+                                <option value="{{ source.name }}" {% if request.args.get('source') == source.name %}selected{% endif %}>
+                                    {{ source.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="keyword" class="form-label">Keyword</label>
+                            <input type="text" class="form-control" id="keyword" name="keyword" value="{{ request.args.get('keyword', '') }}">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="min_confidence" class="form-label">Minimum Confidence</label>
+                            <input type="range" class="form-range" id="min_confidence" name="min_confidence" 
+                                   min="0" max="1" step="0.1" value="{{ request.args.get('min_confidence', '0.5') }}">
+                            <div class="d-flex justify-content-between">
+                                <small>0.0</small>
+                                <small id="confidence-value">{{ request.args.get('min_confidence', '0.5') }}</small>
+                                <small>1.0</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="">All Statuses</option>
+                                <option value="new" {% if request.args.get('status') == 'new' %}selected{% endif %}>New</option>
+                                <option value="contacted" {% if request.args.get('status') == 'contacted' %}selected{% endif %}>Contacted</option>
+                                <option value="qualified" {% if request.args.get('status') == 'qualified' %}selected{% endif %}>Qualified</option>
+                                <option value="converted" {% if request.args.get('status') == 'converted' %}selected{% endif %}>Converted</option>
+                                <option value="rejected" {% if request.args.get('status') == 'rejected' %}selected{% endif %}>Rejected</option>
+                            </select>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-filter me-2"></i> Apply Filters
+                            </button>
+                            <a href="{{ url_for('leads') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i> Clear Filters
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Export Options</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('export_leads', format='csv') }}?{{ request.query_string.decode() }}" class="btn btn-outline-primary">
+                            <i class="fas fa-file-csv me-2"></i> Export to CSV
+                        </a>
+                        <a href="{{ url_for('export_leads', format='json') }}?{{ request.query_string.decode() }}" class="btn btn-outline-primary">
+                            <i class="fas fa-file-code me-2"></i> Export to JSON
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Security Service Leads</h5>
+                    <span class="badge bg-light text-dark">{{ total_count }} leads found</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Company</th>
+                                    <th>Location</th>
+                                    <th>State</th>
+                                    <th>Source</th>
+                                    <th>Date</th>
+                                    <th>Score</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for lead in leads %}
+                                <tr>
+                                    <td>{{ lead.title }}</td>
+                                    <td>{{ lead.company }}</td>
+                                    <td>{{ lead.location }}</td>
+                                    <td>
+                                        {% if lead.states %}
+                                            {% for state in lead.states %}
+                                                <span class="badge bg-info text-dark">{{ state.state_code }}</span>
+                                            {% endfor %}
+                                        {% endif %}
+                                    </td>
+                                    <td><span class="badge bg-secondary">{{ lead.source }}</span></td>
+                                    <td>{{ lead.date_scraped }}</td>
+                                    <td>
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar bg-{{ 'success' if lead.confidence_score >= 0.7 else 'warning' if lead.confidence_score >= 0.4 else 'danger' }}" 
+                                                 role="progressbar" style="width: {{ lead.confidence_score * 100 }}%"></div>
+                                        </div>
+                                        <small>{{ "%.2f"|format(lead.confidence_score) }}</small>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('lead_detail', lead_id=lead.id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="alert alert-info mb-0">
+                                            <i class="fas fa-info-circle me-2"></i> No leads found matching your criteria
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% if total_pages > 1 %}
+                <div class="card-footer">
+                    <nav>
+                        <ul class="pagination justify-content-center mb-0">
+                            <li class="page-item {{ 'disabled' if page == 1 else '' }}">
+                                <a class="page-link" href="{{ url_for('leads', page=page-1, **request.args) if page > 1 else '#' }}">Previous</a>
+                            </li>
+                            
+                            {% for p in range(max(1, page-2), min(total_pages+1, page+3)) %}
+                            <li class="page-item {{ 'active' if p == page else '' }}">
+                                <a class="page-link" href="{{ url_for('leads', page=p, **request.args) }}">{{ p }}</a>
+                            </li>
+                            {% endfor %}
+                            
+                            <li class="page-item {{ 'disabled' if page == total_pages else '' }}">
+                                <a class="page-link" href="{{ url_for('leads', page=page+1, **request.args) if page < total_pages else '#' }}">Next</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">State Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div id="state-map" style="height: 300px;"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                <table class="table table-sm table-hover">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>State</th>
+                                            <th>Leads</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for state in states %}
+                                        <tr>
+                                            <td>{{ state.state_name }}</td>
+                                            <td>{{ state.lead_count|default(0) }}</td>
+                                            <td>
+                                                <a href="{{ url_for('leads', state=state.state_code) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-filter"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson@3"></script>
+<script>
+    // Update confidence slider value display
+    document.getElementById('min_confidence').addEventListener('input', function() {
+        document.getElementById('confidence-value').textContent = this.value;
+    });
+    
+    // State map visualization
+    document.addEventListener('DOMContentLoaded', function() {
+        // State data from the server
+        const stateData = {{ states|tojson }};
+        
+        // Create a map of state codes to lead counts
+        const stateLeadCounts = {};
+        stateData.forEach(state => {
+            stateLeadCounts[state.state_code] = state.lead_count || 0;
+        });
+        
+        // Set up the map
+        const width = document.getElementById('state-map').clientWidth;
+        const height = 300;
+        
+        const svg = d3.select('#state-map')
+            .append('svg')
+            .attr('width', width)
+            .attr('height', height);
+        
+        const projection = d3.geoAlbersUsa()
+            .scale(width)
+            .translate([width / 2, height / 2]);
+        
+        const path = d3.geoPath()
+            .projection(projection);
+        
+        // Color scale for states based on lead count
+        const colorScale = d3.scaleSequential(d3.interpolateBlues)
+            .domain([0, d3.max(stateData, d => d.lead_count || 0) || 1]);
+        
+        // Load US states TopoJSON
+        d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json')
+            .then(us => {
+                // Draw states
+                svg.append('g')
+                    .selectAll('path')
+                    .data(topojson.feature(us, us.objects.states).features)
+                    .enter()
+                    .append('path')
+                    .attr('d', path)
+                    .attr('fill', d => {
+                        const stateObj = stateData.find(s => s.state_name === d.properties.name);
+                        if (stateObj && stateObj.lead_count) {
+                            return colorScale(stateObj.lead_count);
+                        }
+                        return '#eee';
+                    })
+                    .attr('stroke', '#fff')
+                    .attr('stroke-width', 0.5)
+                    .append('title')
+                    .text(d => {
+                        const stateObj = stateData.find(s => s.state_name === d.properties.name);
+                        return `${d.properties.name}: ${stateObj ? stateObj.lead_count || 0 : 0} leads`;
+                    });
+                
+                // Add state borders
+                svg.append('path')
+                    .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
+                    .attr('fill', 'none')
+                    .attr('stroke', '#fff')
+                    .attr('stroke-width', 0.5)
+                    .attr('d', path);
+            })
+            .catch(error => {
+                console.error('Error loading US map data:', error);
+                document.getElementById('state-map').innerHTML = '<div class="alert alert-warning">Unable to load map visualization</div>';
+            });
+    });
+</script>
+{% endblock %}

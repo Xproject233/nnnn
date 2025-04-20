@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+
+{% block title %}Sources{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1>Data Sources</h1>
+        <p class="lead">Manage and monitor the sources used for lead generation.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Available Sources</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Source</th>
+                                <th>URL</th>
+                                <th>Status</th>
+                                <th>Last Run</th>
+                                <th>Leads Generated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for name, scraper in scrapers.items() %}
+                            <tr>
+                                <td>
+                                    <strong>{{ name }}</strong>
+                                </td>
+                                <td>
+                                    <a href="{{ scraper.url }}" target="_blank">{{ scraper.url }}</a>
+                                </td>
+                                <td>
+                                    <span class="badge {% if scraper.enabled %}bg-success{% else %}bg-secondary{% endif %}">
+                                        {% if scraper.enabled %}Enabled{% else %}Disabled{% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    {{ scraper.last_run or 'Never' }}
+                                </td>
+                                <td>
+                                    {{ scraper.leads_count or 0 }}
+                                </td>
+                                <td>
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input source-toggle" type="checkbox" 
+                                               id="source-toggle-{{ name }}" 
+                                               data-source="{{ name }}"
+                                               {% if scraper.enabled %}checked{% endif %}>
+                                        <label class="form-check-label" for="source-toggle-{{ name }}">
+                                            {% if scraper.enabled %}Enabled{% else %}Disabled{% endif %}
+                                        </label>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Add New Source</h5>
+            </div>
+            <div class="card-body">
+                <form id="add-source-form">
+                    <div class="mb-3">
+                        <label for="source-name" class="form-label">Source Name</label>
+                        <input type="text" class="form-control" id="source-name" required>
+                        <div class="form-text">A unique identifier for the source (e.g., "linkedin_jobs")</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="source-url" class="form-label">Source URL</label>
+                        <input type="url" class="form-control" id="source-url" required>
+                        <div class="form-text">The URL to scrape for leads</div>
+                    </div>
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="source-enabled" checked>
+                        <label class="form-check-label" for="source-enabled">Enable Source</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Source</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Source Settings</h5>
+            </div>
+            <div class="card-body">
+                <form id="source-settings-form">
+                    <div class="mb-3">
+                        <label for="request-delay" class="form-label">Request Delay (seconds)</label>
+                        <input type="number" class="form-control" id="request-delay" min="1" max="10" value="2" required>
+                        <div class="form-text">Delay between requests to avoid rate limiting</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="timeout" class="form-label">Request Timeout (seconds)</label>
+                        <input type="number" class="form-control" id="timeout" min="5" max="60" value="30" required>
+                        <div class="form-text">Maximum time to wait for a response</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="max-retries" class="form-label">Maximum Retries</label>
+                        <input type="number" class="form-control" id="max-retries" min="0" max="5" value="3" required>
+                        <div class="form-text">Number of times to retry failed requests</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle source enabled/disabled
+        const sourceToggles = document.querySelectorAll('.source-toggle');
+        sourceToggles.forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                const sourceName = this.dataset.source;
+                const enabled = this.checked;
+                
+                // Update the label
+                const label = this.nextElementSibling;
+                label.textContent = enabled ? 'Enabled' : 'Disabled';
+                
+                // Send update to server
+                fetch('/api/settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        scrapers: {
+                            sources: {
+                                [sourceName]: {
+                                    enabled: enabled
+                                }
+                            }
+                        }
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(`Source ${sourceName} ${enabled ? 'enabled' : 'disabled'} successfully.`);
+                    } else {
+                        alert('Error updating source status.');
+                        // Revert the toggle
+                        this.checked = !enabled;
+                        label.textContent = !enabled ? 'Enabled' : 'Disabled';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error updating source status.');
+                    // Revert the toggle
+                    this.checked = !enabled;
+                    label.textContent = !enabled ? 'Enabled' : 'Disabled';
+                });
+            });
+        });
+        
+        // Add new source
+        const addSourceForm = document.getElementById('add-source-form');
+        addSourceForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const sourceName = document.getElementById('source-name').value;
+            const sourceUrl = document.getElementById('source-url').value;
+            const sourceEnabled = document.getElementById('source-enabled').checked;
+            
+            fetch('/api/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    scrapers: {
+                        sources: {
+                            [sourceName]: {
+                                url: sourceUrl,
+                                enabled: sourceEnabled
+                            }
+                        }
+                    }
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Source added successfully.');
+                    // Clear form
+                    addSourceForm.reset();
+                    // Reload page to show new source
+                    window.location.reload();
+                } else {
+                    alert('Error adding source.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding source.');
+            });
+        });
+        
+        // Update source settings
+        const sourceSettingsForm = document.getElementById('source-settings-form');
+        sourceSettingsForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const requestDelay = document.getElementById('request-delay').value;
+            const timeout = document.getElementById('timeout').value;
+            const maxRetries = document.getElementById('max-retries').value;
+            
+            fetch('/api/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    scrapers: {
+                        request_delay: parseInt(requestDelay),
+                        timeout: parseInt(timeout),
+                        max_retries: parseInt(maxRetries)
+                    }
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Settings updated successfully.');
+                } else {
+                    alert('Error updating settings.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating settings.');
+            });
+        });
+    });
+</script>
+{% endblock %}

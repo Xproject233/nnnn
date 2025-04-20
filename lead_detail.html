@@ -1,0 +1,253 @@
+{% extends 'base.html' %}
+
+{% block title %}Lead Details{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Lead Details</h5>
+                    <div>
+                        <span class="badge bg-{{ 'success' if lead.confidence_score >= 0.7 else 'warning' if lead.confidence_score >= 0.4 else 'danger' }}">
+                            {{ "%.0f"|format(lead.confidence_score * 100) }}% Confidence
+                        </span>
+                        <span class="badge bg-secondary ms-2">{{ lead.status|default('new')|title }}</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h4 class="mb-3">{{ lead.title }}</h4>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Company:</strong> {{ lead.company }}</p>
+                            <p class="mb-1"><strong>Location:</strong> {{ lead.location }}</p>
+                            <p class="mb-1">
+                                <strong>States:</strong> 
+                                {% if lead.states %}
+                                    {% for state in lead.states %}
+                                        <a href="{{ url_for('leads', state=state.state_code) }}" class="badge bg-info text-dark">
+                                            {{ state.state_name }} ({{ state.state_code }})
+                                        </a>
+                                    {% endfor %}
+                                {% else %}
+                                    <span class="text-muted">Not specified</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-1"><strong>Source:</strong> <span class="badge bg-secondary">{{ lead.source }}</span></p>
+                            <p class="mb-1"><strong>Date Posted:</strong> {{ lead.date_posted }}</p>
+                            <p class="mb-1"><strong>Date Scraped:</strong> {{ lead.date_scraped }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>Description</h5>
+                        <div class="p-3 bg-light rounded">
+                            <p>{{ lead.description }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>Contact Information</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <th style="width: 30%">Name</th>
+                                        <td>{{ lead.contact_name|default('Not available') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Email</th>
+                                        <td>
+                                            {% if lead.contact_email %}
+                                                <a href="mailto:{{ lead.contact_email }}">{{ lead.contact_email }}</a>
+                                            {% else %}
+                                                Not available
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>Phone</th>
+                                        <td>
+                                            {% if lead.contact_phone %}
+                                                <a href="tel:{{ lead.contact_phone }}">{{ lead.contact_phone }}</a>
+                                            {% else %}
+                                                Not available
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    {% if lead.url %}
+                    <div class="mb-4">
+                        <a href="{{ lead.url }}" target="_blank" class="btn btn-outline-primary">
+                            <i class="fas fa-external-link-alt me-2"></i> View Original Posting
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Lead Status</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('update_lead_status', lead_id=lead.id) }}">
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="new" {% if lead.status == 'new' %}selected{% endif %}>New</option>
+                                <option value="contacted" {% if lead.status == 'contacted' %}selected{% endif %}>Contacted</option>
+                                <option value="qualified" {% if lead.status == 'qualified' %}selected{% endif %}>Qualified</option>
+                                <option value="converted" {% if lead.status == 'converted' %}selected{% endif %}>Converted</option>
+                                <option value="rejected" {% if lead.status == 'rejected' %}selected{% endif %}>Rejected</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="notes" class="form-label">Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3">{{ lead.notes|default('') }}</textarea>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i> Update Status
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">State Information</h5>
+                </div>
+                <div class="card-body">
+                    {% if lead.states %}
+                        <div id="lead-state-map" style="height: 200px; margin-bottom: 15px;"></div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>State</th>
+                                        <th>Code</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for state in lead.states %}
+                                    <tr>
+                                        <td>{{ state.state_name }}</td>
+                                        <td>{{ state.state_code }}</td>
+                                        <td>
+                                            <a href="{{ url_for('leads', state=state.state_code) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-filter"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle me-2"></i> No state information available for this lead
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('export_lead', lead_id=lead.id, format='json') }}" class="btn btn-outline-primary">
+                            <i class="fas fa-file-code me-2"></i> Export to JSON
+                        </a>
+                        <a href="{{ url_for('leads') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i> Back to Leads
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson@3"></script>
+<script>
+    // State map visualization for this lead
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if lead.states %}
+            // State data for this lead
+            const leadStates = {{ lead.states|tojson }};
+            
+            // Set up the map
+            const width = document.getElementById('lead-state-map').clientWidth;
+            const height = 200;
+            
+            const svg = d3.select('#lead-state-map')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height);
+            
+            const projection = d3.geoAlbersUsa()
+                .scale(width)
+                .translate([width / 2, height / 2]);
+            
+            const path = d3.geoPath()
+                .projection(projection);
+            
+            // Load US states TopoJSON
+            d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json')
+                .then(us => {
+                    // Draw states
+                    svg.append('g')
+                        .selectAll('path')
+                        .data(topojson.feature(us, us.objects.states).features)
+                        .enter()
+                        .append('path')
+                        .attr('d', path)
+                        .attr('fill', d => {
+                            // Highlight states that are in this lead
+                            const stateInLead = leadStates.find(s => 
+                                s.state_name === d.properties.name || 
+                                s.state_code === d.properties.code);
+                            return stateInLead ? '#0d6efd' : '#eee';
+                        })
+                        .attr('stroke', '#fff')
+                        .attr('stroke-width', 0.5)
+                        .append('title')
+                        .text(d => d.properties.name);
+                    
+                    // Add state borders
+                    svg.append('path')
+                        .datum(topojson.mesh(us, us.objects.states, (a, b) => a !== b))
+                        .attr('fill', 'none')
+                        .attr('stroke', '#fff')
+                        .attr('stroke-width', 0.5)
+                        .attr('d', path);
+                })
+                .catch(error => {
+                    console.error('Error loading US map data:', error);
+                    document.getElementById('lead-state-map').innerHTML = '<div class="alert alert-warning">Unable to load map visualization</div>';
+                });
+        {% endif %}
+    });
+</script>
+{% endblock %}
